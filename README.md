@@ -1,2 +1,2 @@
-# Warlord-Nuker
-Say goodbye to servers — the ultimate nuker bot has arrived, unstoppable and ruthless
+#Warlord nuker
+This nuke bot is built to crash servers, ban everyone.
