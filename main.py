@@ -15,11 +15,11 @@ intents.members = True
 
 client = discord.Client(intents=intents)
 
-# Read Bot Token
+
 with open("bottokens.txt", "r") as f:
     token = f.read().strip()
 
-# Safe User IDs
+
 try:
     with open("userids.txt", "r") as f:
         safe_users = set(f.read().splitlines())
